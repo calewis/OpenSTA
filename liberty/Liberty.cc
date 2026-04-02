@@ -178,12 +178,11 @@ LibertyLibrary::setDelayModelType(DelayModelType type)
 }
 
 BusDcl *
-LibertyLibrary::makeBusDcl(std::string name,
+LibertyLibrary::makeBusDcl(std::string_view name,
                            int from,
                            int to)
 {
-  std::string key = name;
-  auto [it, inserted] = bus_dcls_.try_emplace(std::move(key), std::move(name), from, to);
+  auto [it, inserted] = bus_dcls_.try_emplace(name, std::string(name), from, to);
   return &it->second;
 }
 
@@ -203,12 +202,11 @@ LibertyLibrary::busDcls() const
 }
 
 TableTemplate *
-LibertyLibrary::makeTableTemplate(std::string name,
+LibertyLibrary::makeTableTemplate(std::string_view name,
                                   TableTemplateType type)
 {
-  std::string key = name;
-  auto [it, inserted] = template_maps_[int(type)].try_emplace(std::move(key),
-                                                              std::move(name),
+  auto [it, inserted] = template_maps_[int(type)].try_emplace(name,
+                                                              std::string(name),
                                                               type);
   return &it->second;
 }
@@ -265,10 +263,9 @@ LibertyLibrary::setScaleFactors(ScaleFactors *scales)
 }
 
 ScaleFactors *
-LibertyLibrary::makeScaleFactors(std::string name)
+LibertyLibrary::makeScaleFactors(std::string_view name)
 {
-  std::string key = name;
-  auto [it, inserted] = scale_factors_map_.emplace(std::move(key), std::move(name));
+  auto [it, inserted] = scale_factors_map_.try_emplace(name, std::string(name));
   return &it->second;
 }
 
@@ -565,9 +562,9 @@ LibertyLibrary::setDefaultOutputPinRes(const RiseFall *rf,
 }
 
 Wireload *
-LibertyLibrary::makeWireload(std::string name)
+LibertyLibrary::makeWireload(std::string_view name)
 {
-  auto [it, inserted] = wireloads_.try_emplace(name, name, this);
+  auto [it, inserted] = wireloads_.try_emplace(name, std::string(name), this);
   return &it->second;
 }
 
@@ -590,11 +587,9 @@ LibertyLibrary::defaultWireload() const
 }
 
 WireloadSelection *
-LibertyLibrary::makeWireloadSelection(std::string name)
+LibertyLibrary::makeWireloadSelection(std::string_view name)
 {
-  std::string key = name;
-  auto [it, inserted] = wire_load_selections_.try_emplace(std::move(key),
-                                                          std::move(name));
+  auto [it, inserted] = wire_load_selections_.try_emplace(name, std::string(name));
   return &it->second;
 }
 
@@ -629,10 +624,9 @@ LibertyLibrary::setDefaultWireloadMode(WireloadMode mode)
 }
 
 OperatingConditions *
-LibertyLibrary::makeOperatingConditions(std::string name)
+LibertyLibrary::makeOperatingConditions(std::string_view name)
 {
-  std::string key = name;
-  auto [it, inserted] = operating_conditions_.try_emplace(std::move(key), std::move(name));
+  auto [it, inserted] = operating_conditions_.try_emplace(name, std::string(name));
   return &it->second;
 }
 
@@ -719,10 +713,10 @@ LibertyLibrary::setSlewDerateFromLibrary(float derate)
 }
 
 LibertyCell *
-LibertyLibrary::makeScaledCell(std::string name,
-                               std::string filename)
+LibertyLibrary::makeScaledCell(std::string_view name,
+                               std::string_view filename)
 {
-  return new LibertyCell(this, std::move(name), std::move(filename));
+  return new LibertyCell(this, std::string(name), std::string(filename));
 }
 
 ////////////////////////////////////////////////////////////////
@@ -853,10 +847,9 @@ LibertyLibrary::setDefaultOcvDerate(OcvDerate *derate)
 }
 
 OcvDerate *
-LibertyLibrary::makeOcvDerate(std::string name)
+LibertyLibrary::makeOcvDerate(std::string_view name)
 {
-  std::string key = name;
-  auto [it, inserted] = ocv_derate_map_.try_emplace(std::move(key), std::move(name));
+  auto [it, inserted] = ocv_derate_map_.try_emplace(name, std::string(name));
   return &it->second;
 }
 
@@ -867,10 +860,12 @@ LibertyLibrary::findOcvDerate(std::string_view derate_name)
 }
 
 void
-LibertyLibrary::addSupplyVoltage(std::string supply_name,
+LibertyLibrary::addSupplyVoltage(std::string_view supply_name,
                                  float voltage)
 {
-  supply_voltage_map_[std::move(supply_name)] = voltage;
+  auto [it, inserted] = supply_voltage_map_.try_emplace(supply_name, voltage);
+  if (!inserted)
+    it->second = voltage;
 }
 
 void
@@ -903,13 +898,10 @@ LibertyLibrary::findDriverWaveform(std::string_view name)
 }
 
 DriverWaveform *
-LibertyLibrary::makeDriverWaveform(std::string name,
+LibertyLibrary::makeDriverWaveform(std::string_view name,
                                    TablePtr waveforms)
 {
-  std::string key = name;
-  auto [it, inserted] = driver_waveform_map_.try_emplace(std::move(key),
-                                                         std::move(name),
-                                                         waveforms);
+  auto [it, inserted] = driver_waveform_map_.try_emplace(name, std::string(name), waveforms);
   return &it->second;
 }
 
@@ -1019,10 +1011,9 @@ LibertyCell::setHasInternalPorts(bool has_internal)
 }
 
 ModeDef *
-LibertyCell::makeModeDef(std::string name)
+LibertyCell::makeModeDef(std::string_view name)
 {
-  std::string key = name;
-  auto [it, inserted] = mode_defs_.try_emplace(std::move(key), std::move(name));
+  auto [it, inserted] = mode_defs_.try_emplace(name, std::string(name));
   return &it->second;
 }
 
@@ -1039,12 +1030,11 @@ LibertyCell::setScaleFactors(ScaleFactors *scale_factors)
 }
 
 BusDcl *
-LibertyCell::makeBusDcl(std::string name,
+LibertyCell::makeBusDcl(std::string_view name,
                         int from,
                         int to)
 {
-  std::string key = name;
-  auto [it, inserted] = bus_dcls_.try_emplace(std::move(key), std::move(name), from, to);
+  auto [it, inserted] = bus_dcls_.try_emplace(name, std::string(name), from, to);
   return &it->second;
 }
 

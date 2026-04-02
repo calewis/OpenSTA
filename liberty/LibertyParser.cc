@@ -169,10 +169,10 @@ LibertyParser::deleteGroups()
 
 LibertySimpleAttr *
 LibertyParser::makeSimpleAttr(std::string &&name,
-                              const LibertyAttrValue *value,
-                              int line)
+                                    LibertyAttrValue *value,
+                                    int line)
 {
-  LibertySimpleAttr *attr = new LibertySimpleAttr(std::move(name), *value, line);
+  LibertySimpleAttr *attr = new LibertySimpleAttr(std::move(name), std::move(*value), line);
   delete value;
   LibertyGroup *group = this->group();
   group->addAttr(attr);
@@ -182,8 +182,8 @@ LibertyParser::makeSimpleAttr(std::string &&name,
 
 LibertyComplexAttr *
 LibertyParser::makeComplexAttr(std::string &&name,
-                               const LibertyAttrValueSeq *values,
-                               int line)
+                                     LibertyAttrValueSeq *values,
+                                     int line)
 {
   // Defines have the same syntax as complex attributes.
   // Detect and convert them.
@@ -192,7 +192,7 @@ LibertyParser::makeComplexAttr(std::string &&name,
     return nullptr;  // Define is not a complex attr; already added to group
   }
   else {
-    LibertyComplexAttr *attr = new LibertyComplexAttr(std::move(name), *values, line);
+    LibertyComplexAttr *attr = new LibertyComplexAttr(std::move(name), std::move(*values), line);
     delete values;
     LibertyGroup *group = this->group();
     group->addAttr(attr);
@@ -518,7 +518,7 @@ LibertyGroup::findAttrInt(std::string_view attr_name,
 ////////////////////////////////////////////////////////////////
 
 LibertySimpleAttr::LibertySimpleAttr(std::string &&name,
-                                     const LibertyAttrValue value,
+                                     LibertyAttrValue value,
                                      int line) :
   name_(std::move(name)),
   line_(line),
@@ -529,7 +529,7 @@ LibertySimpleAttr::LibertySimpleAttr(std::string &&name,
 ////////////////////////////////////////////////////////////////
 
 LibertyComplexAttr::LibertyComplexAttr(std::string &&name,
-                                       const LibertyAttrValueSeq values,
+                                       LibertyAttrValueSeq values,
                                        int line) :
   name_(std::move(name)),
   values_(std::move(values)),

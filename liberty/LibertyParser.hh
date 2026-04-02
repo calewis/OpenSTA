@@ -81,11 +81,11 @@ public:
   LibertyGroup *group();
   void deleteGroups();
   LibertySimpleAttr *makeSimpleAttr(std::string &&name,
-                                    const LibertyAttrValue *value,
+                                    LibertyAttrValue *value,
                                     int line);
   LibertyComplexAttr *makeComplexAttr(std::string &&name,
-                                     const LibertyAttrValueSeq *values,
-                                     int line);
+                                      LibertyAttrValueSeq *values,
+                                      int line);
   LibertyAttrValue *makeAttrValueString(std::string &&value);
   LibertyAttrValue *makeAttrValueFloat(float value);
   LibertyVariable *makeVariable(std::string &&var,
@@ -123,8 +123,8 @@ private:
 class LibertyGroup
 {
 public:
-  LibertyGroup(const std::string type,
-               const LibertyAttrValueSeq params,
+  LibertyGroup(std::string type,
+               LibertyAttrValueSeq params,
                int line);
   ~LibertyGroup();
   void clear();
@@ -191,7 +191,7 @@ class LibertySimpleAttr
 {
 public:
   LibertySimpleAttr(std::string &&name,
-                    const LibertyAttrValue value,
+                    LibertyAttrValue value,
                     int line);
   const std::string &name() const { return name_; }
   const LibertyAttrValue &value() const { return value_; };
@@ -210,7 +210,7 @@ class LibertyComplexAttr
 {
 public:
   LibertyComplexAttr(std::string &&name,
-                     const LibertyAttrValueSeq values,
+                     LibertyAttrValueSeq values,
                      int line);
   ~LibertyComplexAttr();
   const std::string &name() const { return name_; }

@@ -215,12 +215,12 @@ public:
 
   DelayModelType delayModelType() const { return delay_model_type_; }
   void setDelayModelType(DelayModelType type);
-  BusDcl *makeBusDcl(std::string name,
+  BusDcl *makeBusDcl(std::string_view name,
                      int from,
                      int to);
   BusDcl *findBusDcl(std::string_view name);
   BusDclSeq busDcls() const;
-  TableTemplate *makeTableTemplate(std::string name,
+  TableTemplate *makeTableTemplate(std::string_view name,
                                    TableTemplateType type);
   TableTemplate *findTableTemplate(std::string_view name,
                                    TableTemplateType type);
@@ -235,7 +235,7 @@ public:
 
   void setScaleFactors(ScaleFactors *scales);
   // Make named scale factor group. Returns pointer to the inserted element.
-  ScaleFactors *makeScaleFactors(std::string name);
+  ScaleFactors *makeScaleFactors(std::string_view name);
   ScaleFactors *findScaleFactors(std::string_view name);
   ScaleFactors *scaleFactors() const { return scale_factors_; }
   float scaleFactor(ScaleFactorType type,
@@ -336,18 +336,18 @@ public:
   Units *units() { return units_; }
   const Units *units() const { return units_; }
 
-  Wireload *makeWireload(std::string name);
+  Wireload *makeWireload(std::string_view name);
   const Wireload *findWireload(std::string_view name);
   void setDefaultWireload(const Wireload *wireload);
   const Wireload *defaultWireload() const;
-  WireloadSelection *makeWireloadSelection(std::string name);
+  WireloadSelection *makeWireloadSelection(std::string_view name);
   const WireloadSelection *findWireloadSelection(std::string_view name) const;
   const WireloadSelection *defaultWireloadSelection() const;
   WireloadMode defaultWireloadMode() const;
   void setDefaultWireloadMode(WireloadMode mode);
   void setDefaultWireloadSelection(const WireloadSelection *selection);
 
-  OperatingConditions *makeOperatingConditions(std::string name);
+  OperatingConditions *makeOperatingConditions(std::string_view name);
   OperatingConditions *findOperatingConditions(std::string_view name);
   OperatingConditions *defaultOperatingConditions() const;
   void setDefaultOperatingConditions(OperatingConditions *op_cond);
@@ -358,9 +358,9 @@ public:
   void setOcvArcDepth(float depth);
   OcvDerate *defaultOcvDerate() const;
   void setDefaultOcvDerate(OcvDerate *derate);
-  OcvDerate *makeOcvDerate(std::string name);
+  OcvDerate *makeOcvDerate(std::string_view name);
   OcvDerate *findOcvDerate(std::string_view derate_name);
-  void addSupplyVoltage(std::string suppy_name,
+  void addSupplyVoltage(std::string_view suppy_name,
                         float voltage);
   bool supplyExists(std::string_view supply_name) const;
   void supplyVoltage(std::string_view supply_name,
@@ -369,8 +369,8 @@ public:
                      bool &exists) const;
 
   // Make scaled cell.  Call LibertyCell::addScaledCell after it is complete.
-  LibertyCell *makeScaledCell(std::string name,
-                              std::string filename);
+  LibertyCell *makeScaledCell(std::string_view name,
+                              std::string_view filename);
 
   static void
   makeSceneMap(LibertyLibrary *lib,
@@ -395,7 +395,7 @@ public:
 
   DriverWaveform *findDriverWaveform(std::string_view name);
   DriverWaveform *driverWaveformDefault() { return findDriverWaveform(""); }
-  DriverWaveform *makeDriverWaveform(std::string name,
+  DriverWaveform *makeDriverWaveform(std::string_view name,
                                      TablePtr waveforms);
 
 protected:
@@ -484,7 +484,7 @@ public:
   bool hasInternalPorts() const { return has_internal_ports_; }
   ScaleFactors *scaleFactors() const { return scale_factors_; }
   void setScaleFactors(ScaleFactors *scale_factors);
-  ModeDef *makeModeDef(std::string name);
+  ModeDef *makeModeDef(std::string_view name);
   const ModeDef *findModeDef(std::string_view name) const;
 
   float area() const { return area_; }
@@ -544,7 +544,7 @@ public:
   const Statetable *statetable() const { return statetable_; }
 
   // Find bus declaration local to this cell.
-  BusDcl *makeBusDcl(std::string name,
+  BusDcl *makeBusDcl(std::string_view name,
                      int from,
                      int to);
   BusDcl *findBusDcl(std::string_view name);
@@ -565,7 +565,7 @@ public:
   // AOCV
   float ocvArcDepth() const;
   OcvDerate *ocvDerate() const;
-  OcvDerate *makeOcvDerate(std::string name);
+  OcvDerate *makeOcvDerate(std::string_view name);
   OcvDerate *findOcvDerate(std::string_view derate_name);
 
   // Build helpers.
