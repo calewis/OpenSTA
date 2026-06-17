@@ -10,11 +10,11 @@ Corner: scene1
    0.00    0.00   clock m1_clk (rise edge)
    0.00    0.00   clock network delay (ideal)
    0.00    0.00 ^ r2/CLK (DFFHQx4_ASAP7_75t_R)
-  52.65   52.65 ^ r2/Q (DFFHQx4_ASAP7_75t_R)
-  49.30  101.95 ^ u1/Y (BUFx2_ASAP7_75t_R)
-  61.03  162.97 ^ u2/Y (AND2x2_ASAP7_75t_R)
-  15.77  178.74 ^ r3/D (DFFHQx4_ASAP7_75t_R)
-         178.74   data arrival time
+  52.68   52.68 ^ r2/Q (DFFHQx4_ASAP7_75t_R)
+  49.32  101.99 ^ u1/Y (BUFx2_ASAP7_75t_R)
+  61.05  163.04 ^ u2/Y (AND2x2_ASAP7_75t_R)
+  15.77  178.81 ^ r3/D (DFFHQx4_ASAP7_75t_R)
+         178.81   data arrival time
 
 1000.00 1000.00   clock m1_clk (rise edge)
    0.00 1000.00   clock network delay (ideal)
@@ -24,9 +24,9 @@ Corner: scene1
          986.34   data required time
 ---------------------------------------------------------
          986.34   data required time
-        -178.74   data arrival time
+        -178.81   data arrival time
 ---------------------------------------------------------
-         807.59   slack (MET)
+         807.53   slack (MET)
 
 
 Startpoint: r1 (rising edge-triggered flip-flop clocked by m2_clk)
@@ -41,10 +41,10 @@ Corner: scene2
    0.00    0.00   clock m2_clk (rise edge)
    0.00    0.00   clock network delay (ideal)
    0.00    0.00 ^ r1/CLK (DFFHQx4_ASAP7_75t_R)
- 123.56  123.56 ^ r1/Q (DFFHQx4_ASAP7_75t_R)
- 112.01  235.57 ^ u2/Y (AND2x2_ASAP7_75t_R)
-  22.14  257.71 ^ r3/D (DFFHQx4_ASAP7_75t_R)
-         257.71   data arrival time
+ 123.63  123.63 ^ r1/Q (DFFHQx4_ASAP7_75t_R)
+ 112.02  235.64 ^ u2/Y (AND2x2_ASAP7_75t_R)
+  22.13  257.78 ^ r3/D (DFFHQx4_ASAP7_75t_R)
+         257.78   data arrival time
 
  500.00  500.00   clock m2_clk (rise edge)
    0.00  500.00   clock network delay (ideal)
@@ -54,9 +54,9 @@ Corner: scene2
          459.34   data required time
 ---------------------------------------------------------
          459.34   data required time
-        -257.71   data arrival time
+        -257.78   data arrival time
 ---------------------------------------------------------
-         201.62   slack (MET)
+         201.56   slack (MET)
 
 
 Startpoint: r2 (rising edge-triggered flip-flop clocked by m1_clk)
@@ -71,11 +71,11 @@ Corner: scene1
    0.00    0.00   clock m1_clk (rise edge)
    0.00    0.00   clock network delay (ideal)
    0.00    0.00 ^ r2/CLK (DFFHQx4_ASAP7_75t_R)
-  52.65   52.65 ^ r2/Q (DFFHQx4_ASAP7_75t_R)
-  49.30  101.95 ^ u1/Y (BUFx2_ASAP7_75t_R)
-  61.03  162.97 ^ u2/Y (AND2x2_ASAP7_75t_R)
-  15.77  178.74 ^ r3/D (DFFHQx4_ASAP7_75t_R)
-         178.74   data arrival time
+  52.68   52.68 ^ r2/Q (DFFHQx4_ASAP7_75t_R)
+  49.32  101.99 ^ u1/Y (BUFx2_ASAP7_75t_R)
+  61.05  163.04 ^ u2/Y (AND2x2_ASAP7_75t_R)
+  15.77  178.81 ^ r3/D (DFFHQx4_ASAP7_75t_R)
+         178.81   data arrival time
 
 1000.00 1000.00   clock m1_clk (rise edge)
    0.00 1000.00   clock network delay (ideal)
@@ -85,9 +85,9 @@ Corner: scene1
          986.34   data required time
 ---------------------------------------------------------
          986.34   data required time
-        -178.74   data arrival time
+        -178.81   data arrival time
 ---------------------------------------------------------
-         807.59   slack (MET)
+         807.53   slack (MET)
 
 
 Startpoint: in1 (input port clocked by m1_clk)
@@ -160,10 +160,10 @@ Corner: scene2
    0.00    0.00   clock m2_clk (rise edge)
    0.00    0.00   clock network delay (ideal)
    0.00    0.00 ^ r1/CLK (DFFHQx4_ASAP7_75t_R)
- 123.56  123.56 ^ r1/Q (DFFHQx4_ASAP7_75t_R)
- 112.01  235.57 ^ u2/Y (AND2x2_ASAP7_75t_R)
-  22.14  257.71 ^ r3/D (DFFHQx4_ASAP7_75t_R)
-         257.71   data arrival time
+ 123.63  123.63 ^ r1/Q (DFFHQx4_ASAP7_75t_R)
+ 112.02  235.64 ^ u2/Y (AND2x2_ASAP7_75t_R)
+  22.13  257.78 ^ r3/D (DFFHQx4_ASAP7_75t_R)
+         257.78   data arrival time
 
  500.00  500.00   clock m2_clk (rise edge)
    0.00  500.00   clock network delay (ideal)
@@ -173,9 +173,9 @@ Corner: scene2
          459.34   data required time
 ---------------------------------------------------------
          459.34   data required time
-        -257.71   data arrival time
+        -257.78   data arrival time
 ---------------------------------------------------------
-         201.62   slack (MET)
+         201.56   slack (MET)
 
 
 Startpoint: r3 (rising edge-triggered flip-flop clocked by m2_clk)
@@ -190,9 +190,9 @@ Corner: scene2
    0.00    0.00   clock m2_clk (rise edge)
    0.00    0.00   clock network delay (ideal)
    0.00    0.00 ^ r3/CLK (DFFHQx4_ASAP7_75t_R)
- 123.30  123.30 ^ r3/Q (DFFHQx4_ASAP7_75t_R)
-  19.50  142.80 ^ out (out)
-         142.80   data arrival time
+ 123.35  123.35 ^ r3/Q (DFFHQx4_ASAP7_75t_R)
+  19.50  142.84 ^ out (out)
+         142.84   data arrival time
 
  500.00  500.00   clock m2_clk (rise edge)
    0.00  500.00   clock network delay (ideal)
@@ -201,8 +201,8 @@ Corner: scene2
          400.00   data required time
 ---------------------------------------------------------
          400.00   data required time
-        -142.80   data arrival time
+        -142.84   data arrival time
 ---------------------------------------------------------
-         257.20   slack (MET)
+         257.16   slack (MET)
 
 

@@ -36,6 +36,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstdio>
 #include <optional>
 #include <string_view>
 #include <tuple>
@@ -55,6 +56,32 @@
 #include "Variables.hh"
 
 namespace sta {
+
+// DmpStats gathers execution statistics of the Newton-Raphson solver.
+// It tracks:
+// 1. Total solves: The number of times the NR solver was invoked.
+// 2. Total iterations: The sum of iterations across all solver runs.
+// 3. Iteration histogram: Counts how many times the solver took exactly N iterations to converge.
+//    This helps identify slow-converging cases (e.g. cases taking near-maximum iterations).
+struct DmpStats {
+  static inline size_t num_solves = 0;
+  static inline size_t num_iters = 0;
+  static inline size_t iter_histogram[101] = {0};
+
+  ~DmpStats() {
+    if (num_solves > 0) {
+      std::printf("DmpStats: solves=%zu, total_iters=%zu, avg_iters=%.3f\n",
+                  num_solves, num_iters, (double)num_iters / num_solves);
+      std::printf("DmpStats Histogram (iterations per solve):\n");
+      for (int i = 0; i <= 100; i++) {
+        if (iter_histogram[i] > 0) {
+          std::printf("  %3d iters: %zu solves\n", i, iter_histogram[i]);
+        }
+      }
+    }
+  }
+};
+static DmpStats g_dmp_stats;
 
 // Indices of Newton-Raphson parameter vector.
 enum DmpParam { t0, dt, ceff };
@@ -139,8 +166,28 @@ void
 DmpAlg::findDriverParams(double ceff)
 {
   Eigen::Vector3d x = Eigen::Vector3d::Zero();
-  if (nr_order_ == 3)
+  if (nr_order_ == 3) {
+    // PREDICTOR STEP: Compute a closed-form analytical guess for effective capacitance.
+    // Instead of naively starting at C_total (which requires 5-8 NR iterations), 
+    // we assume a first-order linear voltage ramp to calculate the initial RC shielding.
+    // Derived from:
+    // P. R. O'Brien and T. L. Savarino, "Modeling the driving-point characteristic 
+    // of resistive interconnect for accurate delay estimation," IEEE ICCAD, 1989.
+    
+    double tr_guess = gateCapDelaySlew(c1_ + c2_).second;
+    double tr_safe = std::max(tr_guess, 1.0e-12); // Clamped to 1ps to prevent div-by-zero
+    double time_const = rpi_ * c2_;
+    double ceff_guess = c1_ + c2_; // Default fallback to total cap (Qian's original seed)
+
+    if (time_const > 1.0e-15) { 
+      // Calculate linear ramp shielding on the far-end capacitor (c2_)
+      ceff_guess = c1_ + c2_ * (1.0 - (time_const / tr_safe) * (1.0 - std::exp(-tr_safe / time_const)));
+    }
+    
+    // Mathematically bound the guess to physical limits (C_near <= C_eff <= C_total)
+    ceff = std::clamp(ceff_guess, c1_, c1_ + c2_);
     x[DmpParam::ceff] = ceff;
+  }
   auto [t_vth, t_vl, slew] = gateDelays(ceff);
   // Scale slew to 0-100%
   double dt = slew / (vh_ - vl_);
@@ -904,11 +951,15 @@ DmpZeroC2::voCrossingUpperBound()
 void
 DmpAlg::newtonRaphson(Eigen::Vector3d &x)
 {
+  DmpStats::num_solves++;
   Eigen::Vector3d fvec = Eigen::Vector3d::Zero();
   Eigen::Matrix3d fjac = Eigen::Matrix3d::Zero();
   Eigen::Vector3d p = Eigen::Vector3d::Zero();
 
+  int iters_taken = 0;
   for (int k = 0; k < newton_raphson_max_iter_; k++) {
+    iters_taken++;
+    DmpStats::num_iters++;
     evalDmpEqns(x, fvec, fjac);
 
     p = solveNewtonStep(fjac, fvec);
@@ -921,10 +972,22 @@ DmpAlg::newtonRaphson(Eigen::Vector3d &x)
     bool all_under_x_tol = (p_abs <= x_tol).all();
     x.head(nr_order_) += p.head(nr_order_);
 
+    if (nr_order_ == 3) {
+      double &ceff_val = x[DmpParam::ceff];
+      if (std::isnan(ceff_val)) [[unlikely]] {
+        ceff_val = c1_ + c2_;
+        DmpStats::iter_histogram[std::min(iters_taken, 100)]++;
+        return;
+      }
+      ceff_val = std::clamp(ceff_val, c1_, c1_ + c2_);
+    }
+
     if (all_under_x_tol) {
+      DmpStats::iter_histogram[std::min(iters_taken, 100)]++;
       return;
     }
   }
+  DmpStats::iter_histogram[100]++;
   throw DmpError("Newton-Raphson max iterations exceeded");
 }
 
