@@ -1323,10 +1323,13 @@ ConcreteNetwork::deleteInstanceImpl(Instance *inst)
   ConcreteInstance *cinst = reinterpret_cast<ConcreteInstance*>(inst);
   ConcreteInstanceNetMap *nets = cinst->nets_;
   if (nets) {
-    // Delete nets first (so children pin deletes are not required).
-    for (auto itr = nets->begin(); itr != nets->end(); /*no incr*/) {
-      auto [name, cnet] = *itr;
-      Net *net = reinterpret_cast<Net*>(cnet);
+    // Collect nets first to avoid modifying the map during iteration.
+    std::vector<Net*> net_list;
+    net_list.reserve(nets->size());
+    for (auto& [name, cnet] : *nets) {
+      net_list.push_back(reinterpret_cast<Net*>(cnet));
+    }
+    for (Net *net : net_list) {
       // Delete terminals connected to net.
       NetTermIterator *term_iter = termIterator(net);
       while (term_iter->hasNext()) {
@@ -1334,25 +1337,30 @@ ConcreteNetwork::deleteInstanceImpl(Instance *inst)
         delete term;
       }
       delete term_iter;
-      itr = nets->erase(itr);
       deleteNet(net);
     }
   }
 
-  // Delete children.
-  InstanceChildIterator *child_iter = childIterator(inst);
-  while (child_iter->hasNext()) {
-    Instance *child = child_iter->next();
-    deleteInstance(child);
+  // Delete children safely using a snapshot.
+  ConcreteInstanceChildMap *children = cinst->children_;
+  if (children) {
+    std::vector<Instance*> child_list;
+    child_list.reserve(children->size());
+    for (auto& [name, child] : *children) {
+      child_list.push_back(reinterpret_cast<Instance*>(child));
+    }
+    for (Instance *child : child_list) {
+      deleteInstance(child);
+    }
   }
-  delete child_iter;
 
-  InstancePinIterator *pin_iter = pinIterator(inst);
-  while (pin_iter->hasNext()) {
-    Pin *pin = pin_iter->next();
-    deletePin(pin);
+  ConcretePinSeq pins_snapshot = cinst->pins_;
+  cinst->pins_.clear();
+  for (ConcretePin* cpin : pins_snapshot) {
+    if (cpin) {
+      deletePin(reinterpret_cast<Pin*>(cpin));
+    }
   }
-  delete pin_iter;
 
   Instance *parent_inst = parent(inst);
   if (parent_inst) {
@@ -1490,11 +1498,11 @@ void
 ConcreteNetwork::disconnectNetPin(ConcreteNet *cnet,
                                   ConcretePin *cpin)
 {
-  cnet->deletePin(cpin);
+  if (cnet)
+    cnet->deletePin(cpin);
 
   Pin *pin = reinterpret_cast<Pin*>(cpin);
-  if (isDriver(pin)) {
-    ConcreteNet *cnet = cpin->net();
+  if (isDriver(pin) && cnet) {
     // If there are no terminals the net does not span hierarchy levels
     // and it is safe to incrementally update the drivers.
     if (cnet->terms_ == nullptr) {
@@ -1513,10 +1521,12 @@ ConcreteNetwork::deletePin(Pin *pin)
 {
   ConcretePin *cpin = reinterpret_cast<ConcretePin*>(pin);
   ConcreteNet *cnet = cpin->net();
-  if (cnet)
+  if (cnet) {
     disconnectNetPin(cnet, cpin);
+    cpin->net_ = nullptr;
+  }
   ConcreteInstance *cinst = cpin->instance();
-  if (cinst)
+  if (cinst && !cinst->pins_.empty())
     cinst->deletePin(cpin);
   delete cpin;
 }
@@ -1900,6 +1910,8 @@ ConcreteNet::deletePin(ConcretePin *pin)
     next->net_prev_ = prev;
   if (pins_ == pin)
     pins_ = next;
+  pin->net_prev_ = nullptr;
+  pin->net_next_ = nullptr;
 }
 
 void

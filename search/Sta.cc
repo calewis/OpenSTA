@@ -528,6 +528,18 @@ Sta::clear()
 }
 
 void
+Sta::clearDesign()
+{
+  clearNonSdc();
+  for (Mode *mode : modes_)
+    mode->sdc()->clear();
+  NetworkReader *network_reader = networkReader();
+  if (network_reader) {
+    network_reader->readNetlistBefore();
+  }
+}
+
+void
 Sta::clearNonSdc()
 {
   // Sdc holds search filter, so clear search first.

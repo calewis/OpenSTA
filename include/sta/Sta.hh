@@ -890,9 +890,11 @@ public:
   // User visible but non SDC commands.
 
   // Clear all state except network, scenes and liberty libraries.
-  void clear();
+  virtual void clear();
   // Clear all state except network, scenes liberty libraries, and sdc.
   void clearNonSdc();
+  // Clear design state (graph, search, SDC, and netlist) while preserving scenes and liberty libraries.
+  virtual void clearDesign();
   // Namespace used by command interpreter.
   CmdNamespace cmdNamespace();
   void setCmdNamespace(CmdNamespace namespc);
